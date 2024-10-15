@@ -4,15 +4,17 @@ if (isset($_POST["add"])) {
 
     include_once "connection.php";
 
+
     $title = $_POST['title'];
-    $date = $_POST['date'];
+    $date = date("Y-m-d H:i:s");
+    $ddate = $_POST['ddate'];
     $description = $_POST['description'];
 
     if (!$conn) {
         die("Connection failed: " . mysqli_connect_error());
     }
 
-    $sql = "INSERT INTO tasks (title, date, description) VALUES ('$title', '$date', '$description')";
+    $sql = "INSERT INTO tasks (title, date, ddate, description) VALUES ('$title', '$date', '$ddate', '$description')";
 
     if (mysqli_query($conn, $sql)) {
         Header ("Location: index.php");
@@ -41,8 +43,10 @@ if (isset($_POST["add"])) {
 <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
 <label for="title">Title</label><br>
 <input type="text" id="title" name="title"><br><br>
-<label for="date">Date</label><br>
-<input type="date" id="date" name="date"><br><br>
+<!--<label for="date">Date</label><br>-->
+<!--<input type="date" id="date" name="date"><br><br>-->
+<label for="ddate">Due Date</label><br>
+<input type="datetime-local" id="ddate" name="ddate"><br><br>
 <label for="description">Description</label><br>
 <input type="description" id="description" name="description"><br><br>
 <input type="submit" name="add" id="add" value="Add"><br><br><br>
@@ -62,13 +66,18 @@ if ($conn->connect_error) {
 }
 
 
-$sql = "SELECT title, date, description FROM tasks";
+$sql = "SELECT * FROM tasks";
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
     // output data of each row
     while($row = $result->fetch_assoc()) {
-        echo "Title:  " . $row["title"]. "<br><br>". "Date:  " . $row["date"]. "<br><br>". "Description:  " . $row["description"]. "<br> <br><br><img src='pencil.svg' alt='Edit'>";
+        $id = $row["ID"];
+        echo "Title:  " . $row["title"]. "<br><br>";
+        echo "Date:  " . $row["date"]. "<br><br>";
+        echo "Due Date:  " . $row["ddate"]. "<br><br>";
+        echo  "Description:  " . $row["description"]. "<br> <br>";
+        echo "<a href=update.php?id=$id><img src='pencil.svg' alt='Edit'></a>";
     }
 } else {
     echo "0 results";
